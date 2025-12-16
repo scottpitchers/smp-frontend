@@ -1,11 +1,20 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MonitorPlay, Lock, Mail, ArrowRight, Loader2 } from "lucide-react";
+import {
+  MonitorPlay,
+  Lock,
+  Mail,
+  ArrowRight,
+  Loader2,
+  EyeOff,
+  Eye,
+} from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -56,22 +65,22 @@ const Login = () => {
             <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-[#0F1A3D] border border-[#1E3A8A]/30 rounded-2xl shadow-2xl opacity-10 rounded-full blur-2xl"></div>
 
             <div className="relative z-10 flex flex-col items-center">
-              <div className="w-16 h-16 bg-white rounded-xl shadow-lg flex items-center justify-center mb-4 transform rotate-3 hover:rotate-6 transition-transform duration-300">
-                <MonitorPlay className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-transparent border-4 border-[#FF6B35] rounded-xl shadow-lg flex items-center justify-center mb-4 transform rotate-3 hover:rotate-6 transition-transform duration-300">
+                <MonitorPlay className="w-8 h-8 text-[#FF6B35]" />
               </div>
               <h1 className="text-3xl font-bold text-[#ff6b35] mb-1">
                 SMP CMS
               </h1>
-              <p className="text-blue-100 text-sm">
+              {/* <p className="text-blue-100 text-sm">
                 Signage Management Platform
-              </p>
+              </p> */}
             </div>
           </div>
 
           {/* Form Section */}
           <div className="p-8 pb-10">
             <div className="flex flex-col items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800 text-center">
+              <h2 className="text-2xl font-bold text-white text-center">
                 Welcome Back
               </h2>
               {/* <div className="text-sm text-gray-500 mt-1">
@@ -93,17 +102,17 @@ const Login = () => {
             )}
 
             <form onSubmit={handleLogin} className="space-y-5">
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700 ml-1">
+              <div className="">
+                <label className="text-sm block mb-1 font-medium text-[#d1d5db] ml-1">
                   Email Address
                 </label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                    <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-[#FF6B35] transition-colors" />
                   </div>
                   <input
                     type="email"
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    className="block bg-[#0A1128] border border-[#1E3A8A]/50 text-white rounded-lg w-full pl-10 pr-3 py-3  focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent placeholder-gray-500"
                     placeholder="admin@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -113,16 +122,27 @@ const Login = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700 ml-1">
+                <label className="text-sm block mb-1 font-medium text-[#d1d5db] ml-1">
                   Password
                 </label>
                 <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="cursor-pointer"
+                    >
+                      {showPassword ? (
+                        <Eye className="h-5 w-5 text-gray-400 group-focus-within:text-[#FF6B35] transition-colors" />
+                      ) : (
+                        <EyeOff className="h-5 w-5 text-gray-400 group-focus-within:text-[#FF6B35] transition-colors" />
+                      )}
+                    </button>
+                    {/* <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-[#FF6B35] transition-colors" /> */}
                   </div>
                   <input
-                    type="password"
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    type={showPassword ? "text" : "password"}
+                    className="block bg-[#0A1128] border border-[#1E3A8A]/50 text-white rounded-lg w-full pl-10 pr-3 py-3  focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent placeholder-gray-500"
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -152,7 +172,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3.5 px-4 rounded-xl transform transition-all active:scale-[0.98] shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed group"
+                className="w-full flex items-center justify-center gap-2 py-3 bg-linear-to-r from-[#FF6B35] to-[#FF8C61] text-white rounded-lg hover:opacity-90 transition-all font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#FF6B35]/20"
               >
                 {isLoading ? (
                   <>
