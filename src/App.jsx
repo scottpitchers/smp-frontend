@@ -48,15 +48,14 @@ const App = () => {
         path="/"
         element={
           <ProtectedRoute>
-            {/* <Layout /> */}
-            <SMP_CMS />
+            <Layout />
           </ProtectedRoute>
         }
       >
-        {/* <Route index element={<SMP_CMS />} /> */}
-        {/* <Route path="players" element={<Players />} />
+        <Route index element={<Dashboard />} />
+        <Route path="players" element={<Players />} />
         <Route path="content" element={<Content />} />
-        <Route path="schedules" element={<Schedules />} /> */}
+        <Route path="schedules" element={<Schedules />} />
       </Route>
 
       {/* Redirect unknown routes to home */}
