@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "https://smp-api-i5f5.onrender.com/api";
+  import.meta.env.VITE_API_URL || "https://smp-api-i5f5.onrender.com";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -33,7 +33,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
