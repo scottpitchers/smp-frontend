@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Plus, Edit2, Eye, Wifi, WifiOff, MonitorPlay, X } from "lucide-react";
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "REPLACE_WITH_YOUR_BACKEND_URL/api";
+  import.meta.env.VITE_API_URL || "https://smp-api-i5f5.onrender.com/api";
 
 const Players = () => {
   const [players, setPlayers] = useState([]);
@@ -14,6 +14,8 @@ const Players = () => {
   const [loading, setLoading] = useState(false);
 
   const token = localStorage.getItem("smp_token");
+
+  console.log(token);
 
   const fetchPlayers = async () => {
     try {

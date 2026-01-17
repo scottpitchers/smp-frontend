@@ -10,6 +10,9 @@ import {
   Eye,
 } from "lucide-react";
 
+const API_URL =
+  import.meta.env.VITE_API_URL || "https://smp-api-i5f5.onrender.com/api";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,7 +21,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -29,29 +32,43 @@ const Login = () => {
 
     setIsLoading(true);
 
-    // Simulate API call authentication
-    setTimeout(() => {
-      // Validate credentials
-      if (email === "admin@smp.com" && password === "admin123") {
-        // Create a fake token
-        const token = "simulated_token_" + Math.random().toString(36).substr(2);
-        localStorage.setItem("smp_token", token);
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-        // Also set user info for realism if needed anywhere
-        localStorage.setItem(
-          "smp_user",
-          JSON.stringify({ email, name: "Admin User" })
-        );
+      const data = await response.json();
 
-        setIsLoading(false);
+      if (response.ok) {
+        // Store token
+        localStorage.setItem("smp_token", data.token);
+
+        // Store user info if returned
+        if (data.user) {
+          localStorage.setItem("smp_user", JSON.stringify(data.user));
+        } else {
+          localStorage.setItem(
+            "smp_user",
+            JSON.stringify({ email, name: "Admin User" })
+          );
+        }
+
         navigate("/");
         setEmail("");
         setPassword("");
       } else {
-        setIsLoading(false);
-        setError("Invalid email or password");
+        setError(data.error || data.message || "Invalid email or password");
       }
-    }, 1500); // 1.5s delay for realism
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("Failed to connect to the server. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
