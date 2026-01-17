@@ -1,6 +1,15 @@
 // src/pages/Players.jsx
 import React, { useState, useEffect } from "react";
-import { Plus, Edit2, Eye, Wifi, WifiOff, MonitorPlay, X } from "lucide-react";
+import {
+  Plus,
+  Edit2,
+  Eye,
+  Wifi,
+  WifiOff,
+  MonitorPlay,
+  X,
+  Loader2,
+} from "lucide-react";
 
 const API_URL =
   import.meta.env.VITE_API_URL || "https://smp-api-i5f5.onrender.com";
@@ -12,12 +21,14 @@ const Players = () => {
   const [newPlayerName, setNewPlayerName] = useState("");
   const [location, setLocation] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(true);
 
   const token = localStorage.getItem("smp_token");
 
   console.log(token);
 
   const fetchPlayers = async () => {
+    setFetchLoading(true);
     try {
       const response = await fetch(`${API_URL}/api/admin/players`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -28,6 +39,8 @@ const Players = () => {
       }
     } catch (error) {
       console.error("Error fetching players:", error);
+    } finally {
+      setFetchLoading(false);
     }
   };
 
@@ -88,7 +101,12 @@ const Players = () => {
         </button>
       </div>
 
-      {players.length === 0 ? (
+      {fetchLoading ? (
+        <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-xl shadow-sm">
+          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4" />
+          <p className="text-gray-500 font-medium">Loading players...</p>
+        </div>
+      ) : players.length === 0 ? (
         <div className="bg-white rounded-xl shadow-sm p-12 text-center">
           <MonitorPlay className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <h3 className="text-xl font-bold mb-2">No Players Yet</h3>
