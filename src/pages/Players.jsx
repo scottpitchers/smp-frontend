@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Plus, Edit2, Eye, Wifi, WifiOff, MonitorPlay, X } from "lucide-react";
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "REPLACE_WITH_YOUR_BACKEND_URL/api";
+  import.meta.env.VITE_API_URL || "https://smp-api-i5f5.onrender.com";
 
 const Players = () => {
   const [players, setPlayers] = useState([]);
@@ -15,9 +15,11 @@ const Players = () => {
 
   const token = localStorage.getItem("smp_token");
 
+  console.log(token);
+
   const fetchPlayers = async () => {
     try {
-      const response = await fetch(`${API_URL}/admin/players`, {
+      const response = await fetch(`${API_URL}/api/admin/players`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -41,7 +43,7 @@ const Players = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/admin/pair-device`, {
+      const response = await fetch(`${API_URL}/api/admin/pair-device`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
