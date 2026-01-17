@@ -1,10 +1,30 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MonitorPlay, Wifi, FileVideo, Calendar } from "lucide-react";
 import { mockPlayers, mockContent, mockSchedules } from "../data/mockData";
 
+const API_URL = "REPLACE_WITH_YOUR_BACKEND_URL/api";
+
 const Dashboard = () => {
   const [players, setPlayers] = useState([]);
+
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      try {
+        const token = localStorage.getItem("smp_token");
+        const response = await fetch(`${API_URL}/admin/players`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        if (data.players) {
+          setPlayers(data.players);
+        }
+      } catch (error) {
+        console.error("Error fetching players:", error);
+      }
+    };
+    fetchPlayers();
+  }, []);
   const stats = [
     {
       label: "Total Players",
@@ -108,7 +128,7 @@ const Dashboard = () => {
     // </div>
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white">
+        <div className="bg-linear-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-blue-100 text-sm">Total Players</p>
@@ -118,7 +138,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white">
+        <div className="bg-linear-to-br from-green-500 to-green-600 rounded-xl p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-green-100 text-sm">Online</p>
@@ -130,7 +150,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white">
+        <div className="bg-linear-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-purple-100 text-sm">Content Items</p>
@@ -140,7 +160,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white">
+        <div className="bg-linear-to-br from-orange-500 to-orange-600 rounded-xl p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-orange-100 text-sm">Schedules</p>

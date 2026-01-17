@@ -1,120 +1,161 @@
+// src/components/Players.jsx
 import React, { useState } from "react";
-import {
-  Plus,
-  MonitorPlay,
-  Wifi,
-  WifiOff,
-  Edit2,
-  Eye,
-  MoreHorizontal,
-} from "lucide-react";
-import { mockPlayers } from "../data/mockData";
+import { Plus, Edit2, Eye, Wifi, WifiOff } from "lucide-react";
+import { MonitorPlay } from "lucide-react";
 
 const Players = () => {
-  const [players] = useState(mockPlayers);
+  const [players, setPlayers] = useState([]);
+  const [showPairingModal, setShowPairingModal] = useState(false);
+  const [pairingCode, setPairingCode] = useState("");
+  const [newPlayerName, setNewPlayerName] = useState("");
 
+  const fetchPlayers = async () => {
+    try {
+      const response = await fetch(`${API_URL}/admin/players`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (data.players) {
+        setPlayers(data.players);
+      }
+    } catch (error) {
+      console.error("Error fetching players:", error);
+    }
+  };
+
+  const handlePairDevice = async () => {
+    if (!pairingCode || !newPlayerName) {
+      alert("Please enter both pairing code and player name");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/admin/pair-device`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          pairing_code: pairingCode,
+          player_name: newPlayerName,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        alert("Player paired successfully!");
+        setShowPairingModal(false);
+        setPairingCode("");
+        setNewPlayerName("");
+        fetchPlayers();
+      } else {
+        alert(data.error || "Pairing failed");
+      }
+    } catch (error) {
+      alert("Error pairing device. Please try again.");
+    }
+  };
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Players</h1>
-          <p className="text-gray-500 mt-1">
-            Manage your registered display devices
-          </p>
-        </div>
-        <button className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl hover:bg-blue-700 transition shadow-md hover:shadow-lg active:scale-95 font-medium">
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Players</h2>
+        <button
+          onClick={() => setShowPairingModal(true)}
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+        >
           <Plus className="w-5 h-5" />
           Pair New Player
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {players.map((player) => (
-          <div
-            key={player.id}
-            className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-300 hover:border-blue-100"
+      {players.length === 0 ? (
+        <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+          <MonitorPlay className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-xl font-bold mb-2">No Players Yet</h3>
+          <p className="text-gray-500 mb-4">
+            Pair your first player to get started
+          </p>
+          <button
+            onClick={() => setShowPairingModal(true)}
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
           >
-            <div className="flex items-start justify-between mb-6">
-              <div className="flex items-center gap-4">
+            Pair New Player
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {players.map((player) => (
+            <div
+              key={player.id || player.player_id}
+              className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                      player.status === "online" ? "bg-green-100" : "bg-red-100"
+                    }`}
+                  >
+                    <MonitorPlay
+                      className={`w-6 h-6 ${
+                        player.status === "online"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg">{player.name}</h3>
+                    <p className="text-sm text-gray-500">
+                      {player.location || "No location"}
+                    </p>
+                  </div>
+                </div>
                 <div
-                  className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors ${
-                    player.status === "online"
-                      ? "bg-green-100 text-green-600"
-                      : "bg-red-100 text-red-600"
-                  }`}
-                >
-                  <MonitorPlay className="w-7 h-7" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
-                    {player.name}
-                  </h3>
-                  <p className="text-sm text-gray-500">{player.location}</p>
-                </div>
-              </div>
-              <button className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100">
-                <MoreHorizontal className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-3 mb-6">
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-500">Status</span>
-                <span
-                  className={`px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 ${
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${
                     player.status === "online"
                       ? "bg-green-100 text-green-700"
                       : "bg-red-100 text-red-700"
                   }`}
                 >
                   {player.status === "online" ? (
-                    <Wifi className="w-3 h-3" />
+                    <Wifi className="w-3 h-3 inline mr-1" />
                   ) : (
-                    <WifiOff className="w-3 h-3" />
+                    <WifiOff className="w-3 h-3 inline mr-1" />
                   )}
-                  {player.status === "online" ? "Online" : "Offline"}
-                </span>
+                  {player.status}
+                </div>
               </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-500">Current Content</span>
-                <span className="font-medium text-gray-900">
-                  {player.content}
-                </span>
+
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Content:</span>
+                  <span className="font-medium">
+                    {player.content || "None"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Uptime:</span>
+                  <span className="font-medium">{player.uptime || "0h"}</span>
+                </div>
               </div>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-500">Uptime</span>
-                <span className="font-medium text-gray-900">
-                  {player.uptime}
-                </span>
+
+              <div className="flex gap-2 mt-4">
+                <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition text-sm">
+                  <Edit2 className="w-4 h-4" />
+                  Edit
+                </button>
+                <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition text-sm">
+                  <Eye className="w-4 h-4" />
+                  Preview
+                </button>
               </div>
             </div>
-
-            <div className="flex gap-3">
-              <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-50 text-gray-700 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition font-medium text-sm">
-                <Edit2 className="w-4 h-4" />
-                Edit
-              </button>
-              <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-50 text-gray-700 rounded-xl hover:bg-purple-50 hover:text-purple-600 transition font-medium text-sm">
-                <Eye className="w-4 h-4" />
-                View
-              </button>
-            </div>
-          </div>
-        ))}
-
-        {/* Add Player Card Mockup */}
-        <div className="min-h-[250px] border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center text-center p-6 hover:border-blue-400 hover:bg-blue-50/30 transition-all cursor-pointer group">
-          <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-            <Plus className="w-8 h-8 text-gray-400 group-hover:text-blue-500" />
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900">
-            Add New Player
-          </h3>
-          <p className="text-sm text-gray-500 mt-1 max-w-[200px]">
-            Register a new display device to your network
-          </p>
+          ))}
         </div>
-      </div>
+      )}
     </div>
   );
 };
