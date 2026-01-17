@@ -27,7 +27,7 @@ const Layout = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex font-sans">
+    <div className="min-h-screen bg-gray-100 flex font-sans">
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200 flex flex-col fixed inset-y-0 left-0 z-10">
         <div className="p-4 border-b border-gray-200 flex items-center gap-2">
@@ -81,7 +81,7 @@ const Layout = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 ml-64 p-8 overflow-y-auto h-screen">
+      <main className="flex-1 ml-64 p-6 overflow-y-auto h-screen">
         <div className="max-w-7xl mx-auto animation-fade-in">
           <Outlet />
         </div>
