@@ -31,13 +31,9 @@ const Layout = () => {
     <div className="min-h-screen bg-gray-50 flex font-sans">
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200 flex flex-col fixed inset-y-0 left-0 z-10 shadow-sm transition-all duration-300">
-        <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-200">
-            <MonitorPlay className="w-5 h-5" />
-          </div>
-          <span className="font-bold text-xl text-gray-800 tracking-tight">
-            SMP CMS
-          </span>
+        <div className="p-4 border-b border-gray-200 flex items-center gap-2">
+          <MonitorPlay className="w-6 h-6 text-blue-600" />
+          <span className="font-bold text-lg">SMP CMS</span>
         </div>
 
         <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
