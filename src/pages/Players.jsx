@@ -160,7 +160,7 @@ const Players = () => {
                 </div>
               </div>
 
-              <div className="flex gap-2 mt-4">
+              {/* <div className="flex gap-2 mt-4">
                 <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition text-sm">
                   <Edit2 className="w-4 h-4" />
                   Edit
@@ -169,7 +169,7 @@ const Players = () => {
                   <Eye className="w-4 h-4" />
                   Preview
                 </button>
-              </div>
+              </div> */}
             </div>
           ))}
         </div>
