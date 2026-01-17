@@ -43,18 +43,13 @@ const Login = () => {
 
       const data = await response.json();
 
-      if (response.ok) {
+      if (data.success && data.token) {
         // Store token
         localStorage.setItem("smp_token", data.token);
 
-        // Store user info if returned
+        // Store user info
         if (data.user) {
           localStorage.setItem("smp_user", JSON.stringify(data.user));
-        } else {
-          localStorage.setItem(
-            "smp_user",
-            JSON.stringify({ email, name: "Admin User" })
-          );
         }
 
         navigate("/");

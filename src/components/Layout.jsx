@@ -26,6 +26,8 @@ const Layout = () => {
     { path: "/schedules", icon: Calendar, label: "Schedules" },
   ];
 
+  const user = JSON.parse(localStorage.getItem("smp_user") || "{}");
+
   return (
     <div className="min-h-screen bg-gray-100 flex font-sans">
       {/* Sidebar */}
@@ -62,10 +64,10 @@ const Layout = () => {
             </div>
             <div className="flex-1 overflow-hidden">
               <p className="text-sm font-medium text-gray-900 truncate">
-                Admin User
+                {user.company || "Admin User"}
               </p>
               <p className="text-xs text-gray-500 truncate">
-                admin@example.com
+                {user.email || "admin@example.com"}
               </p>
             </div>
           </div>
