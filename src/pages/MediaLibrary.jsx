@@ -73,14 +73,6 @@ const MediaLibrary = () => {
 
   useEffect(() => {
     fetchMedia();
-    // Simulate data if empty for demonstration
-    const mockData = [
-      { id: 1, name: "Promo_Video_2026.mp4", type: "video", url: "https://www.w3schools.com/html/mov_bbb.mp4", size: 5400000, created_at: "2026-03-10T10:00:00Z" },
-      { id: 2, name: "Burger_Menu.jpg", type: "image", url: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80", size: 1200000, created_at: "2026-03-11T14:30:00Z" },
-      { id: 3, name: "Special_Offer.png", type: "image", url: "https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?auto=format&fit=crop&w=800&q=80", size: 850000, created_at: "2026-03-12T09:15:00Z" }
-    ];
-    // Uncomment this line to test with mock data if API is empty
-    setTimeout(() => { setMediaItems(prev => prev.length ? prev : mockData); setLoading(false); }, 1000);
   }, []);
 
   // Upload Logic
@@ -156,18 +148,6 @@ const MediaLibrary = () => {
 
     xhr.onerror = () => {
       updateUploadStatus(uploadItem.id, 'error');
-      // Simulated upload success for local testing when API fails
-      setTimeout(() => {
-        updateUploadStatus(uploadItem.id, 'success');
-        setMediaItems(prev => [{
-            id: uploadItem.id,
-            name: uploadItem.name,
-            type: uploadItem.file.type.startsWith('video') ? 'video' : 'image',
-            url: URL.createObjectURL(uploadItem.file),
-            size: uploadItem.file.size,
-            created_at: new Date().toISOString()
-        }, ...prev]);
-      }, 1500);
     };
 
     xhr.send(formData);
@@ -194,15 +174,15 @@ const MediaLibrary = () => {
     if (!deleteModal) return;
     try {
       const token = localStorage.getItem("smp_token");
-      await fetch(`${API_URL}/api/admin/media/${deleteModal.id}`, {
+      const res = await fetch(`${API_URL}/api/admin/media/${deleteModal.id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` }
       });
+      if (!res.ok) throw new Error("Failed to delete");
       setMediaItems(prev => prev.filter(m => m.id !== deleteModal.id));
     } catch (e) {
       console.error(e);
-      // fallback for local testing
-      setMediaItems(prev => prev.filter(m => m.id !== deleteModal.id));
+      alert("Error deleting media");
     } finally {
       closeDeleteModal();
     }
@@ -218,7 +198,7 @@ const MediaLibrary = () => {
     if (!renameModal || !newName.trim()) return;
     try {
       const token = localStorage.getItem("smp_token");
-      await fetch(`${API_URL}/api/admin/media/${renameModal.id}/rename`, {
+      const res = await fetch(`${API_URL}/api/admin/media/${renameModal.id}`, {
         method: "PUT",
         headers: { 
           Authorization: `Bearer ${token}`,
@@ -226,11 +206,11 @@ const MediaLibrary = () => {
         },
         body: JSON.stringify({ name: newName })
       });
-      
+      if (!res.ok) throw new Error("Failed to rename");
       setMediaItems(prev => prev.map(m => m.id === renameModal.id ? { ...m, name: newName } : m));
     } catch (e) {
       console.error(e);
-      setMediaItems(prev => prev.map(m => m.id === renameModal.id ? { ...m, name: newName } : m));
+      alert("Error renaming media");
     } finally {
       closeRenameModal();
     }
