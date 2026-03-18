@@ -12,6 +12,7 @@ import Players from "./pages/Players";
 import Content from "./pages/Content";
 import Schedules from "./pages/Schedules";
 import Login from "./pages/Login";
+import MediaLibrary from "./pages/MediaLibrary";
 import SMP_CMS from "./components/MainPage";
 
 const ProtectedRoute = ({ children }) => {
@@ -55,6 +56,7 @@ const App = () => {
         <Route index element={<Dashboard />} />
         <Route path="players" element={<Players />} />
         <Route path="content" element={<Content />} />
+        <Route path="media-library/*" element={<MediaLibrary />} />
         <Route path="schedules" element={<Schedules />} />
       </Route>
 
