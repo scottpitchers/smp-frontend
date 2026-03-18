@@ -61,8 +61,17 @@ const MediaLibrary = () => {
       });
       if (res.ok) {
         const data = await res.json();
-        // Assume API returns { media: [...] } or array
-        setMediaItems(data.media || data || []);
+        // The API returns an array directly based on the user's example
+        const items = Array.isArray(data) ? data : (data.media || []);
+        
+        const mappedItems = items.map(m => ({
+          ...m,
+          name: m.original_filename || m.filename || "Unknown",
+          type: m.mime_type || m.file_type || "unknown",
+          size: m.size_bytes || 0,
+        }));
+        
+        setMediaItems(mappedItems);
       }
     } catch (error) {
       console.error("Failed to fetch media:", error);
@@ -204,7 +213,7 @@ const MediaLibrary = () => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ name: newName })
+        body: JSON.stringify({ original_filename: newName, filename: newName, name: newName })
       });
       if (!res.ok) throw new Error("Failed to rename");
       setMediaItems(prev => prev.map(m => m.id === renameModal.id ? { ...m, name: newName } : m));
