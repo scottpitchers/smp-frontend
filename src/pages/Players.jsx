@@ -9,6 +9,8 @@ import {
   MonitorPlay,
   X,
   Loader2,
+  ListVideo,
+  ChevronRight,
 } from "lucide-react";
 
 const API_URL =
@@ -16,7 +18,10 @@ const API_URL =
 
 const Players = () => {
   const [players, setPlayers] = useState([]);
+  const [playlists, setPlaylists] = useState([]);
   const [showPairingModal, setShowPairingModal] = useState(false);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [pairingCode, setPairingCode] = useState("");
   const [newPlayerName, setNewPlayerName] = useState("");
   const [location, setLocation] = useState("");
@@ -25,22 +30,83 @@ const Players = () => {
 
   const token = localStorage.getItem("smp_token");
 
-  console.log(token);
-
   const fetchPlayers = async () => {
     setFetchLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/admin/players`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await response.json();
-      if (data.players) {
-        setPlayers(data.players);
+      const headers = { Authorization: `Bearer ${token}` };
+
+      // Fetch players
+      try {
+        const playersRes = await fetch(`${API_URL}/api/admin/players`, {
+          headers,
+        });
+        if (playersRes.ok) {
+          const data = await playersRes.json();
+          if (data.players) setPlayers(data.players);
+        } else {
+          console.error("Players fetch failed with status:", playersRes.status);
+        }
+      } catch (err) {
+        console.error("Error fetching players:", err);
+      }
+
+      // Fetch playlists separately so it doesn't break players if endpoint is missing
+      try {
+        const playlistsRes = await fetch(`${API_URL}/api/admin/playlists`, {
+          headers,
+        });
+        if (playlistsRes.ok) {
+          const data = await playlistsRes.json();
+          setPlaylists(Array.isArray(data) ? data : data.playlists || []);
+        } else {
+          console.warn(
+            "Playlists fetch failed with status:",
+            playlistsRes.status,
+          );
+        }
+      } catch (err) {
+        console.warn("Playlists endpoint might not be ready yet:", err);
+        // Fallback to empty array if fetch fails (e.g. CORS or 404)
+        setPlaylists([]);
       }
     } catch (error) {
-      console.error("Error fetching players:", error);
+      console.error("Critical error in fetchPlayers:", error);
     } finally {
       setFetchLoading(false);
+    }
+  };
+
+  const openAssignModal = (player) => {
+    setSelectedPlayer(player);
+    setShowAssignModal(true);
+  };
+
+  const handleAssignPlaylist = async (playlistId) => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${API_URL}/api/admin/players/${selectedPlayer.id || selectedPlayer.player_id}/assign-playlist`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ playlist_id: playlistId }),
+        },
+      );
+
+      if (response.ok) {
+        alert("Playlist assigned and push notification sent!");
+        setShowAssignModal(false);
+        fetchPlayers();
+      } else {
+        alert("Assignment failed");
+      }
+    } catch (error) {
+      alert("Error assigning playlist");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -178,7 +244,15 @@ const Players = () => {
                 </div>
               </div>
 
-              {/* <div className="flex gap-2 mt-4">
+              <div className="flex gap-2 mt-4">
+                <button
+                  onClick={() => openAssignModal(player)}
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition text-sm font-medium cursor-pointer"
+                >
+                  <ListVideo className="w-4 h-4" />
+                  Assign Playlist
+                </button>
+                {/* <div className="flex gap-2 mt-4">
                 <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition text-sm">
                   <Edit2 className="w-4 h-4" />
                   Edit
@@ -188,8 +262,78 @@ const Players = () => {
                   Preview
                 </button>
               </div> */}
+              </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Assignment Modal */}
+      {showAssignModal && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100 animate-in fade-in zoom-in duration-200">
+            <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <ListVideo className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">
+                    Assign Playlist
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    Select content for {selectedPlayer?.name}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowAssignModal(false)}
+                className="p-2 cursor-pointer hover:bg-gray-200 rounded-xl transition-colors text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="max-h-[300px] overflow-y-auto space-y-2 pr-1">
+                {playlists.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">
+                      No playlists found. Create one first!
+                    </p>
+                  </div>
+                ) : (
+                  playlists.map((playlist) => (
+                    <button
+                      key={playlist.id}
+                      onClick={() => handleAssignPlaylist(playlist.id)}
+                      disabled={loading}
+                      className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-blue-500 hover:bg-blue-50 transition group"
+                    >
+                      <div className="text-left">
+                        <p className="font-bold text-gray-900 group-hover:text-blue-700">
+                          {playlist.name}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {playlist.items?.length || 0} items
+                        </p>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-blue-500" />
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div className="p-4 bg-gray-50 border-t border-gray-100">
+              <button
+                onClick={() => setShowAssignModal(false)}
+                className="w-full cursor-pointer py-3 text-gray-600 font-bold hover:bg-gray-200 rounded-xl transition"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -234,7 +378,7 @@ const Players = () => {
                     value={pairingCode}
                     onChange={(e) =>
                       setPairingCode(
-                        e.target.value.replace(/\D/g, "").slice(0, 6)
+                        e.target.value.replace(/\D/g, "").slice(0, 6),
                       )
                     }
                     maxLength={6}

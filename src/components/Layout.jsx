@@ -10,7 +10,7 @@ import {
   ChevronDown,
   ChevronRight,
   Layout as LayoutIcon,
-  ListVideo
+  ListVideo,
 } from "lucide-react";
 
 const Layout = () => {
@@ -38,9 +38,9 @@ const Layout = () => {
     { path: "/players", icon: MonitorPlay, label: "Players" },
     { path: "/content", icon: FileVideo, label: "Content" },
     { path: "/schedules", icon: Calendar, label: "Schedules" },
-    { 
-      path: "/media-library", 
-      icon: FileVideo, 
+    {
+      path: "/media-library",
+      icon: FileVideo,
       label: "Media Library",
       // subItems: [
       //   { path: "/media-library/all", label: "All Media" },
@@ -48,8 +48,8 @@ const Layout = () => {
       // ]
     },
     // { path: "/players", icon: MonitorPlay, label: "Screens" },
+    { path: "/playlists", icon: ListVideo, label: "Playlists" },
     // { path: "/layouts", icon: LayoutIcon, label: "Layouts" },
-    // { path: "/playlists", icon: ListVideo, label: "Playlists" },
   ];
 
   const user = JSON.parse(localStorage.getItem("smp_user") || "{}");
