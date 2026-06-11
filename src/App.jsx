@@ -16,6 +16,9 @@ import MediaLibrary from "./pages/MediaLibrary";
 import Playlists from "./pages/Playlists";
 import SMP_CMS from "./components/MainPage";
 
+import Layouts from "./pages/Layouts";
+import LayoutPlayer from "./components/LayoutPlayer";
+
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("smp_token");
 
@@ -45,6 +48,7 @@ const App = () => {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/public/layouts/:id" element={<LayoutPlayer />} />
 
       <Route
         path="/"
@@ -59,6 +63,7 @@ const App = () => {
         <Route path="content" element={<Content />} />
         <Route path="media-library/*" element={<MediaLibrary />} />
         <Route path="playlists" element={<Playlists />} />
+        <Route path="layouts" element={<Layouts />} />
         <Route path="schedules" element={<Schedules />} />
       </Route>
 

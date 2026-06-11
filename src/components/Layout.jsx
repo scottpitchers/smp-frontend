@@ -49,7 +49,7 @@ const Layout = () => {
     },
     // { path: "/players", icon: MonitorPlay, label: "Screens" },
     { path: "/playlists", icon: ListVideo, label: "Playlists" },
-    // { path: "/layouts", icon: LayoutIcon, label: "Layouts" },
+    { path: "/layouts", icon: LayoutIcon, label: "Layouts" },
   ];
 
   const user = JSON.parse(localStorage.getItem("smp_user") || "{}");
