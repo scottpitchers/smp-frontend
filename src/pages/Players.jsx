@@ -19,6 +19,7 @@ const API_URL =
 const Players = () => {
   const [players, setPlayers] = useState([]);
   const [playlists, setPlaylists] = useState([]);
+  const [layouts, setLayouts] = useState([]);
   const [showPairingModal, setShowPairingModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
@@ -27,6 +28,7 @@ const Players = () => {
   const [location, setLocation] = useState("");
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);
+  const [assignTab, setAssignTab] = useState("playlist"); // "playlist" | "layout"
 
   const token = localStorage.getItem("smp_token");
 
@@ -69,6 +71,22 @@ const Players = () => {
         // Fallback to empty array if fetch fails (e.g. CORS or 404)
         setPlaylists([]);
       }
+
+      // Fetch layouts
+      try {
+        const layoutsRes = await fetch(`${API_URL}/api/admin/layouts`, {
+          headers,
+        });
+        if (layoutsRes.ok) {
+          const data = await layoutsRes.json();
+          setLayouts(data.layouts || []);
+        } else {
+          console.warn("Layouts fetch failed with status:", layoutsRes.status);
+        }
+      } catch (err) {
+        console.warn("Layouts endpoint failed:", err);
+        setLayouts([]);
+      }
     } catch (error) {
       console.error("Critical error in fetchPlayers:", error);
     } finally {
@@ -78,6 +96,7 @@ const Players = () => {
 
   const openAssignModal = (player) => {
     setSelectedPlayer(player);
+    setAssignTab("playlist");
     setShowAssignModal(true);
   };
 
@@ -97,7 +116,7 @@ const Players = () => {
       );
 
       if (response.ok) {
-        alert("Playlist assigned and push notification sent!");
+        alert("Playlist assigned successfully!");
         setShowAssignModal(false);
         fetchPlayers();
       } else {
@@ -105,6 +124,35 @@ const Players = () => {
       }
     } catch (error) {
       alert("Error assigning playlist");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAssignLayout = async (layoutId) => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${API_URL}/api/admin/players/${selectedPlayer.id || selectedPlayer.player_id}/assign-layout`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ layout_id: layoutId }),
+        },
+      );
+
+      if (response.ok) {
+        alert("Layout assigned successfully!");
+        setShowAssignModal(false);
+        fetchPlayers();
+      } else {
+        alert("Assignment failed");
+      }
+    } catch (error) {
+      alert("Error assigning layout");
     } finally {
       setLoading(false);
     }
@@ -279,10 +327,10 @@ const Players = () => {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-gray-900">
-                    Assign Playlist
+                    Assign Content
                   </h3>
                   <p className="text-xs text-gray-500">
-                    Select content for {selectedPlayer?.name}
+                    Select screen layout or playlist for {selectedPlayer?.name}
                   </p>
                 </div>
               </div>
@@ -294,33 +342,86 @@ const Players = () => {
               </button>
             </div>
 
+            {/* Modal Tabs */}
+            <div className="flex border-b border-gray-100 bg-gray-50/30 px-6 py-2">
+              <button
+                onClick={() => setAssignTab("playlist")}
+                className={`flex-1 py-2 text-center text-sm font-bold border-b-2 transition-all ${
+                  assignTab === "playlist"
+                    ? "border-blue-600 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-800"
+                }`}
+              >
+                Playlists
+              </button>
+              <button
+                onClick={() => setAssignTab("layout")}
+                className={`flex-1 py-2 text-center text-sm font-bold border-b-2 transition-all ${
+                  assignTab === "layout"
+                    ? "border-blue-600 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-800"
+                }`}
+              >
+                Screen Layouts
+              </button>
+            </div>
+
             <div className="p-6 space-y-4">
               <div className="max-h-[300px] overflow-y-auto space-y-2 pr-1">
-                {playlists.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500">
-                      No playlists found. Create one first!
-                    </p>
-                  </div>
+                {assignTab === "playlist" ? (
+                  playlists.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500 text-sm">
+                        No playlists found. Create one first!
+                      </p>
+                    </div>
+                  ) : (
+                    playlists.map((playlist) => (
+                      <button
+                        key={playlist.id}
+                        onClick={() => handleAssignPlaylist(playlist.id)}
+                        disabled={loading}
+                        className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-blue-500 hover:bg-blue-50 transition group"
+                      >
+                        <div className="text-left">
+                          <p className="font-bold text-gray-900 group-hover:text-blue-700">
+                            {playlist.name}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {playlist.items?.length || 0} items
+                          </p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-blue-500" />
+                      </button>
+                    ))
+                  )
                 ) : (
-                  playlists.map((playlist) => (
-                    <button
-                      key={playlist.id}
-                      onClick={() => handleAssignPlaylist(playlist.id)}
-                      disabled={loading}
-                      className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-blue-500 hover:bg-blue-50 transition group"
-                    >
-                      <div className="text-left">
-                        <p className="font-bold text-gray-900 group-hover:text-blue-700">
-                          {playlist.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {playlist.items?.length || 0} items
-                        </p>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-blue-500" />
-                    </button>
-                  ))
+                  layouts.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500 text-sm">
+                        No layouts found. Create one first!
+                      </p>
+                    </div>
+                  ) : (
+                    layouts.map((layout) => (
+                      <button
+                        key={layout.id}
+                        onClick={() => handleAssignLayout(layout.id)}
+                        disabled={loading}
+                        className="w-full flex items-center justify-between p-4 rounded-xl border border-gray-100 hover:border-blue-500 hover:bg-blue-50 transition group"
+                      >
+                        <div className="text-left">
+                          <p className="font-bold text-gray-900 group-hover:text-blue-700">
+                            {layout.name}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {layout.zones?.length || 0} zones • {layout.aspect_ratio}
+                          </p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-blue-500" />
+                      </button>
+                    ))
+                  )
                 )}
               </div>
             </div>
