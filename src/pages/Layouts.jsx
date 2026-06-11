@@ -22,68 +22,256 @@ import {
   Loader2,
 } from "lucide-react";
 
-const API_URL = import.meta.env.VITE_API_URL || "https://smp-api-i5f5.onrender.com";
+const API_URL =
+  import.meta.env.VITE_API_URL || "https://smp-api-i5f5.onrender.com";
 
 const PREBUILT_TEMPLATES = [
   {
     name: "Full Screen",
     description: "Single zone covering 100% of screen",
     zones: [
-      { id: "zone-full", name: "Full Zone", top: 0, left: 0, width: 100, height: 100, layer: 1, content_type: "empty", content_id: null, bg_color: "#000000" }
-    ]
+      {
+        id: "zone-full",
+        name: "Full Zone",
+        top: 0,
+        left: 0,
+        width: 100,
+        height: 100,
+        layer: 1,
+        content_type: "empty",
+        content_id: null,
+        bg_color: "#000000",
+      },
+    ],
   },
   {
     name: "Split Horizontal",
     description: "Two zones: Top (70%) + Bottom (30%)",
     zones: [
-      { id: "zone-top", name: "Top Zone", top: 0, left: 0, width: 100, height: 70, layer: 1, content_type: "empty", content_id: null, bg_color: "#000000" },
-      { id: "zone-bottom", name: "Bottom Zone", top: 70, left: 0, width: 100, height: 30, layer: 1, content_type: "empty", content_id: null, bg_color: "#1e293b" }
-    ]
+      {
+        id: "zone-top",
+        name: "Top Zone",
+        top: 0,
+        left: 0,
+        width: 100,
+        height: 70,
+        layer: 1,
+        content_type: "empty",
+        content_id: null,
+        bg_color: "#000000",
+      },
+      {
+        id: "zone-bottom",
+        name: "Bottom Zone",
+        top: 70,
+        left: 0,
+        width: 100,
+        height: 30,
+        layer: 1,
+        content_type: "empty",
+        content_id: null,
+        bg_color: "#1e293b",
+      },
+    ],
   },
   {
     name: "Split Vertical",
     description: "Two zones: Left (60%) + Right (40%)",
     zones: [
-      { id: "zone-left", name: "Left Zone", top: 0, left: 0, width: 60, height: 100, layer: 1, content_type: "empty", content_id: null, bg_color: "#000000" },
-      { id: "zone-right", name: "Right Zone", top: 0, left: 60, width: 40, height: 100, layer: 1, content_type: "empty", content_id: null, bg_color: "#1e293b" }
-    ]
+      {
+        id: "zone-left",
+        name: "Left Zone",
+        top: 0,
+        left: 0,
+        width: 60,
+        height: 100,
+        layer: 1,
+        content_type: "empty",
+        content_id: null,
+        bg_color: "#000000",
+      },
+      {
+        id: "zone-right",
+        name: "Right Zone",
+        top: 0,
+        left: 60,
+        width: 40,
+        height: 100,
+        layer: 1,
+        content_type: "empty",
+        content_id: null,
+        bg_color: "#1e293b",
+      },
+    ],
   },
   {
     name: "L-Shape",
     description: "Main content + bottom ticker + side panel",
     zones: [
-      { id: "zone-main", name: "Main Content", top: 0, left: 0, width: 70, height: 75, layer: 1, content_type: "empty", content_id: null, bg_color: "#000000" },
-      { id: "zone-side", name: "Side Panel", top: 0, left: 70, width: 30, height: 100, layer: 1, content_type: "empty", content_id: null, bg_color: "#1e293b" },
-      { id: "zone-ticker", name: "Bottom Ticker", top: 75, left: 0, width: 70, height: 25, layer: 1, content_type: "empty", content_id: null, bg_color: "#0f172a" }
-    ]
+      {
+        id: "zone-main",
+        name: "Main Content",
+        top: 0,
+        left: 0,
+        width: 70,
+        height: 75,
+        layer: 1,
+        content_type: "empty",
+        content_id: null,
+        bg_color: "#000000",
+      },
+      {
+        id: "zone-side",
+        name: "Side Panel",
+        top: 0,
+        left: 70,
+        width: 30,
+        height: 100,
+        layer: 1,
+        content_type: "empty",
+        content_id: null,
+        bg_color: "#1e293b",
+      },
+      {
+        id: "zone-ticker",
+        name: "Bottom Ticker",
+        top: 75,
+        left: 0,
+        width: 70,
+        height: 25,
+        layer: 1,
+        content_type: "empty",
+        content_id: null,
+        bg_color: "#0f172a",
+      },
+    ],
   },
   {
     name: "Picture-in-Picture",
     description: "Full screen main + small overlay in corner",
     zones: [
-      { id: "zone-main", name: "Main Content", top: 0, left: 0, width: 100, height: 100, layer: 1, content_type: "empty", content_id: null, bg_color: "#000000" },
-      { id: "zone-pip", name: "Overlay", top: 70, left: 70, width: 25, height: 25, layer: 2, content_type: "empty", content_id: null, bg_color: "#1e293b" }
-    ]
+      {
+        id: "zone-main",
+        name: "Main Content",
+        top: 0,
+        left: 0,
+        width: 100,
+        height: 100,
+        layer: 1,
+        content_type: "empty",
+        content_id: null,
+        bg_color: "#000000",
+      },
+      {
+        id: "zone-pip",
+        name: "Overlay",
+        top: 70,
+        left: 70,
+        width: 25,
+        height: 25,
+        layer: 2,
+        content_type: "empty",
+        content_id: null,
+        bg_color: "#1e293b",
+      },
+    ],
   },
   {
     name: "Three Column",
     description: "Three equal vertical columns",
     zones: [
-      { id: "zone-col1", name: "Left Column", top: 0, left: 0, width: 33.33, height: 100, layer: 1, content_type: "empty", content_id: null, bg_color: "#000000" },
-      { id: "zone-col2", name: "Center Column", top: 0, left: 33.33, width: 33.33, height: 100, layer: 1, content_type: "empty", content_id: null, bg_color: "#1e293b" },
-      { id: "zone-col3", name: "Right Column", top: 0, left: 66.66, width: 33.34, height: 100, layer: 1, content_type: "empty", content_id: null, bg_color: "#0f172a" }
-    ]
+      {
+        id: "zone-col1",
+        name: "Left Column",
+        top: 0,
+        left: 0,
+        width: 33.33,
+        height: 100,
+        layer: 1,
+        content_type: "empty",
+        content_id: null,
+        bg_color: "#000000",
+      },
+      {
+        id: "zone-col2",
+        name: "Center Column",
+        top: 0,
+        left: 33.33,
+        width: 33.33,
+        height: 100,
+        layer: 1,
+        content_type: "empty",
+        content_id: null,
+        bg_color: "#1e293b",
+      },
+      {
+        id: "zone-col3",
+        name: "Right Column",
+        top: 0,
+        left: 66.66,
+        width: 33.34,
+        height: 100,
+        layer: 1,
+        content_type: "empty",
+        content_id: null,
+        bg_color: "#0f172a",
+      },
+    ],
   },
   {
     name: "Grid 2x2",
     description: "Four equal quadrants",
     zones: [
-      { id: "zone-tl", name: "Top Left", top: 0, left: 0, width: 50, height: 50, layer: 1, content_type: "empty", content_id: null, bg_color: "#000000" },
-      { id: "zone-tr", name: "Top Right", top: 0, left: 50, width: 50, height: 50, layer: 1, content_type: "empty", content_id: null, bg_color: "#1e293b" },
-      { id: "zone-bl", name: "Bottom Left", top: 50, left: 0, width: 50, height: 50, layer: 1, content_type: "empty", content_id: null, bg_color: "#0f172a" },
-      { id: "zone-br", name: "Bottom Right", top: 50, left: 50, width: 50, height: 50, layer: 1, content_type: "empty", content_id: null, bg_color: "#334155" }
-    ]
-  }
+      {
+        id: "zone-tl",
+        name: "Top Left",
+        top: 0,
+        left: 0,
+        width: 50,
+        height: 50,
+        layer: 1,
+        content_type: "empty",
+        content_id: null,
+        bg_color: "#000000",
+      },
+      {
+        id: "zone-tr",
+        name: "Top Right",
+        top: 0,
+        left: 50,
+        width: 50,
+        height: 50,
+        layer: 1,
+        content_type: "empty",
+        content_id: null,
+        bg_color: "#1e293b",
+      },
+      {
+        id: "zone-bl",
+        name: "Bottom Left",
+        top: 50,
+        left: 0,
+        width: 50,
+        height: 50,
+        layer: 1,
+        content_type: "empty",
+        content_id: null,
+        bg_color: "#0f172a",
+      },
+      {
+        id: "zone-br",
+        name: "Bottom Right",
+        top: 50,
+        left: 50,
+        width: 50,
+        height: 50,
+        layer: 1,
+        content_type: "empty",
+        content_id: null,
+        bg_color: "#334155",
+      },
+    ],
+  },
 ];
 
 const COLOR_PRESETS = [
@@ -96,7 +284,7 @@ const COLOR_PRESETS = [
   "#0891b2",
   "#16a34a",
   "#dc2626",
-  "#ffffff"
+  "#ffffff",
 ];
 
 const Layouts = () => {
@@ -342,7 +530,7 @@ const Layouts = () => {
           return { ...z, [field]: value };
         }
         return z;
-      })
+      }),
     );
   };
 
@@ -352,11 +540,12 @@ const Layouts = () => {
 
     let currentLayer = activeZone.layer || 1;
     let newLayer = currentLayer;
-    
+
     if (direction === "front") {
       newLayer = Math.max(...layoutZones.map((z) => z.layer || 1), 0) + 1;
     } else if (direction === "back") {
-      newLayer = Math.min(1, Math.min(...layoutZones.map((z) => z.layer || 1), 1)) - 1;
+      newLayer =
+        Math.min(1, Math.min(...layoutZones.map((z) => z.layer || 1), 1)) - 1;
     }
 
     updateSelectedZone("layer", newLayer);
@@ -484,7 +673,7 @@ const Layouts = () => {
           width: parseFloat(width.toFixed(2)),
           height: parseFloat(height.toFixed(2)),
         };
-      })
+      }),
     );
   };
 
@@ -515,7 +704,7 @@ const Layouts = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ layout_id: targetLayoutForAssign.id }),
-        }
+        },
       );
 
       if (res.ok) {
@@ -542,7 +731,7 @@ const Layouts = () => {
 
   // Filtered layouts
   const filteredLayouts = layouts.filter((l) =>
-    l.name.toLowerCase().includes(searchQuery.toLowerCase())
+    l.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -552,7 +741,9 @@ const Layouts = () => {
         <div className="space-y-6 animate-in fade-in duration-300">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Screen Layouts</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Screen Layouts
+              </h1>
               <p className="text-gray-500 mt-1">
                 Design and manage multi-zone broadcast screens.
               </p>
@@ -591,7 +782,8 @@ const Layouts = () => {
                 No layouts found
               </h3>
               <p className="text-gray-500 mt-2">
-                Create a customized multi-zone screen to separate content channels.
+                Create a customized multi-zone screen to separate content
+                channels.
               </p>
               <button
                 onClick={startNewLayout}
@@ -718,7 +910,9 @@ const Layouts = () => {
               </button>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  {editingLayout ? "Edit Screen Layout" : "Create Screen Layout"}
+                  {editingLayout
+                    ? "Edit Screen Layout"
+                    : "Create Screen Layout"}
                 </h1>
                 <p className="text-sm text-gray-500">
                   Manage grid positions and content nodes
@@ -792,8 +986,12 @@ const Layouts = () => {
                     className="w-4 h-4 text-blue-600 rounded"
                   />
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Snap to grid</p>
-                    <p className="text-xs text-gray-400">Align in 5% increments</p>
+                    <p className="text-sm font-semibold text-gray-900">
+                      Snap to grid
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      Align in 5% increments
+                    </p>
                   </div>
                 </label>
                 <button
@@ -835,7 +1033,9 @@ const Layouts = () => {
                   return (
                     <div
                       key={zone.id}
-                      onMouseDown={(e) => handleCanvasMouseDown(e, zone, "move")}
+                      onMouseDown={(e) =>
+                        handleCanvasMouseDown(e, zone, "move")
+                      }
                       style={{
                         position: "absolute",
                         left: `${zone.left}%`,
@@ -864,7 +1064,9 @@ const Layouts = () => {
 
                       {/* Top Left resize handle */}
                       <div
-                        onMouseDown={(e) => handleCanvasMouseDown(e, zone, "resize", "tl")}
+                        onMouseDown={(e) =>
+                          handleCanvasMouseDown(e, zone, "resize", "tl")
+                        }
                         className={`absolute w-3 h-3 bg-white border border-blue-600 rounded-full cursor-nwse-resize -left-1.5 -top-1.5 opacity-0 group-hover:opacity-100 ${
                           isActive ? "opacity-100 scale-125" : ""
                         }`}
@@ -872,7 +1074,9 @@ const Layouts = () => {
 
                       {/* Bottom Right resize handle */}
                       <div
-                        onMouseDown={(e) => handleCanvasMouseDown(e, zone, "resize", "br")}
+                        onMouseDown={(e) =>
+                          handleCanvasMouseDown(e, zone, "resize", "br")
+                        }
                         className={`absolute w-3 h-3 bg-white border border-blue-600 rounded-full cursor-nwse-resize -right-1.5 -bottom-1.5 opacity-0 group-hover:opacity-100 ${
                           isActive ? "opacity-100 scale-125" : ""
                         }`}
@@ -914,7 +1118,9 @@ const Layouts = () => {
                       <input
                         type="text"
                         value={activeZone.name}
-                        onChange={(e) => updateSelectedZone("name", e.target.value)}
+                        onChange={(e) =>
+                          updateSelectedZone("name", e.target.value)
+                        }
                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm"
                       />
                     </div>
@@ -928,7 +1134,12 @@ const Layouts = () => {
                         <input
                           type="number"
                           value={activeZone.left}
-                          onChange={(e) => updateSelectedZone("left", parseFloat(e.target.value) || 0)}
+                          onChange={(e) =>
+                            updateSelectedZone(
+                              "left",
+                              parseFloat(e.target.value) || 0,
+                            )
+                          }
                           className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded text-sm outline-none"
                         />
                       </div>
@@ -939,7 +1150,12 @@ const Layouts = () => {
                         <input
                           type="number"
                           value={activeZone.top}
-                          onChange={(e) => updateSelectedZone("top", parseFloat(e.target.value) || 0)}
+                          onChange={(e) =>
+                            updateSelectedZone(
+                              "top",
+                              parseFloat(e.target.value) || 0,
+                            )
+                          }
                           className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded text-sm outline-none"
                         />
                       </div>
@@ -950,7 +1166,12 @@ const Layouts = () => {
                         <input
                           type="number"
                           value={activeZone.width}
-                          onChange={(e) => updateSelectedZone("width", parseFloat(e.target.value) || 0)}
+                          onChange={(e) =>
+                            updateSelectedZone(
+                              "width",
+                              parseFloat(e.target.value) || 0,
+                            )
+                          }
                           className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded text-sm outline-none"
                         />
                       </div>
@@ -961,7 +1182,12 @@ const Layouts = () => {
                         <input
                           type="number"
                           value={activeZone.height}
-                          onChange={(e) => updateSelectedZone("height", parseFloat(e.target.value) || 0)}
+                          onChange={(e) =>
+                            updateSelectedZone(
+                              "height",
+                              parseFloat(e.target.value) || 0,
+                            )
+                          }
                           className="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded text-sm outline-none"
                         />
                       </div>
@@ -1000,13 +1226,17 @@ const Layouts = () => {
                       <input
                         type="color"
                         value={activeZone.bg_color || "#1e293b"}
-                        onChange={(e) => updateSelectedZone("bg_color", e.target.value)}
+                        onChange={(e) =>
+                          updateSelectedZone("bg_color", e.target.value)
+                        }
                         className="w-8 h-8 rounded cursor-pointer border border-gray-200 p-0 overflow-hidden"
                       />
                       <input
                         type="text"
                         value={activeZone.bg_color || "#1e293b"}
-                        onChange={(e) => updateSelectedZone("bg_color", e.target.value)}
+                        onChange={(e) =>
+                          updateSelectedZone("bg_color", e.target.value)
+                        }
                         className="flex-1 px-2 py-1.5 bg-gray-50 border border-gray-200 rounded text-sm outline-none font-mono"
                       />
                     </div>
@@ -1089,12 +1319,18 @@ const Layouts = () => {
                       <div className="space-y-2 animate-in fade-in duration-200">
                         {playlists.length === 0 ? (
                           <p className="text-xs text-orange-500 bg-orange-50 p-2 rounded">
-                            No playlists found. Please create one in the Playlists section.
+                            No playlists found. Please create one in the
+                            Playlists section.
                           </p>
                         ) : (
                           <select
                             value={activeZone.content_id || ""}
-                            onChange={(e) => updateSelectedZone("content_id", e.target.value || null)}
+                            onChange={(e) =>
+                              updateSelectedZone(
+                                "content_id",
+                                e.target.value || null,
+                              )
+                            }
                             className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none text-sm"
                           >
                             <option value="">-- Choose Playlist --</option>
@@ -1113,17 +1349,23 @@ const Layouts = () => {
                         {activeZone.content_id ? (
                           <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-between gap-2">
                             <div className="flex items-center gap-2 overflow-hidden">
-                              {mediaLibrary.find((x) => x.id === activeZone.content_id)?.file_type === "video" ? (
+                              {mediaLibrary.find(
+                                (x) => x.id === activeZone.content_id,
+                              )?.file_type === "video" ? (
                                 <Film className="w-4 h-4 text-blue-500 shrink-0" />
                               ) : (
                                 <ImageIcon className="w-4 h-4 text-indigo-500 shrink-0" />
                               )}
                               <span className="text-xs font-semibold truncate text-gray-700">
-                                {mediaLibrary.find((x) => x.id === activeZone.content_id)?.original_filename || "Media Item"}
+                                {mediaLibrary.find(
+                                  (x) => x.id === activeZone.content_id,
+                                )?.original_filename || "Media Item"}
                               </span>
                             </div>
                             <button
-                              onClick={() => updateSelectedZone("content_id", null)}
+                              onClick={() =>
+                                updateSelectedZone("content_id", null)
+                              }
                               className="text-gray-400 hover:text-red-500"
                             >
                               <X className="w-3.5 h-3.5" />
@@ -1161,23 +1403,27 @@ const Layouts = () => {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border border-gray-100 animate-in fade-in zoom-in duration-200 flex flex-col max-h-[85vh]">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
               <div>
-                <h3 className="text-xl font-bold text-gray-900">Choose Screen Template</h3>
-                <p className="text-xs text-gray-400 mt-0.5">Select a multi-zone structure to start with</p>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Choose Screen Template
+                </h3>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Select a multi-zone structure to start with
+                </p>
               </div>
               <button
                 onClick={() => setShowTemplatePicker(false)}
-                className="p-2 hover:bg-gray-100 rounded-full transition text-gray-400"
+                className="p-2 hover:bg-gray-100 cursor-pointer rounded-full transition text-gray-400"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
               {PREBUILT_TEMPLATES.map((tmpl) => (
                 <button
                   key={tmpl.name}
                   onClick={() => handleSelectTemplate(tmpl)}
-                  className="flex items-start gap-4 p-4 text-left border border-gray-100 hover:border-blue-500 hover:bg-blue-50/50 rounded-xl transition group"
+                  className="flex items-start gap-4 p-4 cursor-pointer text-left border border-gray-100 hover:border-blue-500 hover:bg-blue-50/50 rounded-xl transition group"
                 >
                   <div className="aspect-video w-28 h-16 bg-slate-950 border border-slate-800 rounded relative overflow-hidden shrink-0 shadow-md">
                     {tmpl.zones.map((zone, idx) => (
@@ -1250,7 +1496,9 @@ const Layouts = () => {
                         ) : (
                           <div className="flex flex-col items-center justify-center text-slate-400">
                             <Film className="w-8 h-8 opacity-40 mb-1" />
-                            <span className="text-[9px] uppercase tracking-wide">Video</span>
+                            <span className="text-[9px] uppercase tracking-wide">
+                              Video
+                            </span>
                           </div>
                         )}
                         <div className="absolute inset-0 bg-blue-600/0 group-hover:bg-blue-600/10 transition-colors flex items-center justify-center">
@@ -1279,8 +1527,12 @@ const Layouts = () => {
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
               <div>
-                <h3 className="text-xl font-bold text-gray-900">Assign Layout</h3>
-                <p className="text-xs text-gray-500 mt-0.5">Choose a signage screen player</p>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Assign Layout
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Choose a signage screen player
+                </p>
               </div>
               <button
                 onClick={() => setShowPlayerAssign(false)}
@@ -1313,7 +1565,9 @@ const Layouts = () => {
                     <div className="flex items-center gap-2 shrink-0">
                       <span
                         className={`w-2 h-2 rounded-full ${
-                          player.status === "online" ? "bg-green-500 animate-pulse" : "bg-gray-300"
+                          player.status === "online"
+                            ? "bg-green-500 animate-pulse"
+                            : "bg-gray-300"
                         }`}
                       />
                       <span className="text-[10px] text-gray-400 uppercase font-bold">
@@ -1342,35 +1596,57 @@ const Layouts = () => {
           <div className="bg-slate-900 border-b border-slate-800 px-6 py-4 flex justify-between items-center">
             <div>
               <h3 className="text-lg font-bold">
-                {previewingId === "local" ? layoutName : layouts.find((l) => l.id === previewingId)?.name} (Preview)
+                {previewingId === "local"
+                  ? layoutName
+                  : layouts.find((l) => l.id === previewingId)?.name}{" "}
+                (Preview)
               </h3>
-              <p className="text-xs text-slate-400 mt-0.5">Showing live broadcast feed simulation</p>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Showing live broadcast feed simulation
+              </p>
             </div>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => {
                   const enriched = layoutZones.map((z) => {
                     const zoneCopy = { ...z };
-                    if (zoneCopy.content_type === "playlist" && zoneCopy.content_id) {
-                      const p = playlists.find((x) => x.id === zoneCopy.content_id);
+                    if (
+                      zoneCopy.content_type === "playlist" &&
+                      zoneCopy.content_id
+                    ) {
+                      const p = playlists.find(
+                        (x) => x.id === zoneCopy.content_id,
+                      );
                       if (p) {
-                        zoneCopy.playlist = { id: p.id, name: p.name, items: p.items };
+                        zoneCopy.playlist = {
+                          id: p.id,
+                          name: p.name,
+                          items: p.items,
+                        };
                       }
-                    } else if (zoneCopy.content_type === "media" && zoneCopy.content_id) {
-                      const m = mediaLibrary.find((x) => x.id === zoneCopy.content_id);
+                    } else if (
+                      zoneCopy.content_type === "media" &&
+                      zoneCopy.content_id
+                    ) {
+                      const m = mediaLibrary.find(
+                        (x) => x.id === zoneCopy.content_id,
+                      );
                       if (m) {
                         zoneCopy.media = {
                           id: m.id,
                           filename: m.filename,
                           original_filename: m.original_filename,
                           file_type: m.file_type,
-                          url: m.url
+                          url: m.url,
                         };
                       }
                     }
                     return zoneCopy;
                   });
-                  sessionStorage.setItem("smp_preview_temp", JSON.stringify(enriched));
+                  sessionStorage.setItem(
+                    "smp_preview_temp",
+                    JSON.stringify(enriched),
+                  );
                   window.open(`/public/layouts/preview_local`, "_blank");
                 }}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold shadow transition"
@@ -1397,26 +1673,43 @@ const Layouts = () => {
                     ? (() => {
                         const enriched = layoutZones.map((z) => {
                           const zoneCopy = { ...z };
-                          if (zoneCopy.content_type === "playlist" && zoneCopy.content_id) {
-                            const p = playlists.find((x) => x.id === zoneCopy.content_id);
+                          if (
+                            zoneCopy.content_type === "playlist" &&
+                            zoneCopy.content_id
+                          ) {
+                            const p = playlists.find(
+                              (x) => x.id === zoneCopy.content_id,
+                            );
                             if (p) {
-                              zoneCopy.playlist = { id: p.id, name: p.name, items: p.items };
+                              zoneCopy.playlist = {
+                                id: p.id,
+                                name: p.name,
+                                items: p.items,
+                              };
                             }
-                          } else if (zoneCopy.content_type === "media" && zoneCopy.content_id) {
-                            const m = mediaLibrary.find((x) => x.id === zoneCopy.content_id);
+                          } else if (
+                            zoneCopy.content_type === "media" &&
+                            zoneCopy.content_id
+                          ) {
+                            const m = mediaLibrary.find(
+                              (x) => x.id === zoneCopy.content_id,
+                            );
                             if (m) {
                               zoneCopy.media = {
                                 id: m.id,
                                 filename: m.filename,
                                 original_filename: m.original_filename,
                                 file_type: m.file_type,
-                                url: m.url
+                                url: m.url,
                               };
                             }
                           }
                           return zoneCopy;
                         });
-                        sessionStorage.setItem("smp_preview_temp", JSON.stringify(enriched));
+                        sessionStorage.setItem(
+                          "smp_preview_temp",
+                          JSON.stringify(enriched),
+                        );
                         return "/public/layouts/preview_local";
                       })()
                     : `/public/layouts/${previewingId}`
