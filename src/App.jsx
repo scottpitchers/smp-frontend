@@ -18,6 +18,8 @@ import SMP_CMS from "./components/MainPage";
 
 import Layouts from "./pages/Layouts";
 import LayoutPlayer from "./components/LayoutPlayer";
+import PlaylistPlayer from "./components/PlaylistPlayer";
+import ScreenOff from "./components/ScreenOff";
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("smp_token");
@@ -49,6 +51,8 @@ const App = () => {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/public/layouts/:id" element={<LayoutPlayer />} />
+      <Route path="/public/playlists/:id" element={<PlaylistPlayer />} />
+      <Route path="/public/screen-off" element={<ScreenOff />} />
 
       <Route
         path="/"
