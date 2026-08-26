@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   UploadCloud,
   X,
@@ -11,11 +11,10 @@ import {
   Filter,
   Grid,
   List as ListIcon,
-  CheckCircle,
-  AlertCircle,
   Play,
   Maximize2
 } from "lucide-react";
+import { useUploads } from "../context/useUploads";
 
 const API_URL = import.meta.env.VITE_API_URL || "https://smp-api-i5f5.onrender.com";
 
@@ -38,19 +37,30 @@ const MediaLibrary = () => {
   const [typeFilter, setTypeFilter] = useState("all"); 
   const [sortBy, setSortBy] = useState("date_desc"); // "name_asc", "name_desc", "date_desc", "size_desc"
 
-  // Upload State
-  const [uploadingFiles, setUploadingFiles] = useState([]); 
+  // Uploads are handled globally by UploadContext (persistent across pages)
+  const { startUploads, uploads } = useUploads();
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
+  const prevActiveUploadsRef = useRef(0);
+
+  // Refresh list when all in-flight uploads finish
+  useEffect(() => {
+    const activeCount = uploads.filter((u) => u.status === "uploading").length;
+    if (
+      prevActiveUploadsRef.current > 0 &&
+      activeCount === 0 &&
+      uploads.some((u) => u.status === "success")
+    ) {
+      fetchMedia();
+    }
+    prevActiveUploadsRef.current = activeCount;
+  }, [uploads]);
 
   // Modals
   const [previewMedia, setPreviewMedia] = useState(null);
   const [deleteModal, setDeleteModal] = useState(null);
   const [renameModal, setRenameModal] = useState(null);
   const [newName, setNewName] = useState("");
-
-  const supportedImages = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
-  const supportedVideos = ['video/mp4', 'video/webm', 'video/quicktime'];
 
   // Fetch Media
   const fetchMedia = async () => {
@@ -104,74 +114,14 @@ const MediaLibrary = () => {
 
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
+    e.target.value = "";
     processFiles(files);
   };
 
   const processFiles = (files) => {
-    const validFiles = files.filter(f => supportedImages.includes(f.type) || supportedVideos.includes(f.type));
-    
-    if (validFiles.length !== files.length) {
+    const { rejected } = startUploads(files);
+    if (rejected > 0) {
       alert("Some files were rejected. Only JPG, PNG, GIF, WebP, SVG, MP4, WebM, and MOV are supported.");
-    }
-
-    if (validFiles.length > 0) {
-      const newUploads = validFiles.map(file => ({
-        id: Math.random().toString(36).substring(7),
-        file,
-        name: file.name,
-        progress: 0,
-        status: 'uploading' // 'uploading' | 'success' | 'error'
-      }));
-      setUploadingFiles(prev => [...prev, ...newUploads]);
-
-      newUploads.forEach(uploadItem => {
-        uploadFile(uploadItem);
-      });
-    }
-  };
-
-  const uploadFile = (uploadItem) => {
-    const token = localStorage.getItem("smp_token");
-    const formData = new FormData();
-    formData.append("file", uploadItem.file);
-
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", `${API_URL}/api/admin/media/upload`, true);
-    if (token) xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        const percentComplete = Math.round((event.loaded / event.total) * 100);
-        updateUploadProgress(uploadItem.id, percentComplete);
-      }
-    };
-
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        updateUploadStatus(uploadItem.id, 'success');
-        fetchMedia(); // Refresh list after successful upload
-      } else {
-        updateUploadStatus(uploadItem.id, 'error');
-      }
-    };
-
-    xhr.onerror = () => {
-      updateUploadStatus(uploadItem.id, 'error');
-    };
-
-    xhr.send(formData);
-  };
-
-  const updateUploadProgress = (id, progress) => {
-    setUploadingFiles(prev => prev.map(f => f.id === id ? { ...f, progress } : f));
-  };
-
-  const updateUploadStatus = (id, status) => {
-    setUploadingFiles(prev => prev.map(f => f.id === id ? { ...f, status, progress: status === 'success' ? 100 : f.progress } : f));
-    if (status === 'success') {
-      setTimeout(() => {
-        setUploadingFiles(prev => prev.filter(f => f.id !== id));
-      }, 3000);
     }
   };
 
@@ -277,36 +227,6 @@ const MediaLibrary = () => {
           Supported Video Formats: MP4, WebM, MOV (H.264 codec preferred).
         </p>
       </div>
-
-      {/* Upload Progress Area */}
-      {uploadingFiles.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 space-y-3">
-          <h4 className="font-semibold text-gray-800 text-sm">Uploading Files ({uploadingFiles.length})</h4>
-          <div className="max-h-48 overflow-y-auto space-y-2 pr-2">
-            {uploadingFiles.map((file) => (
-              <div key={file.id} className="flex items-center gap-4 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                <div className="w-8 h-8 rounded bg-blue-100 flex items-center justify-center shrink-0">
-                  {file.file.type.startsWith('video') ? <Film className="w-4 h-4 text-blue-600" /> : <ImageIcon className="w-4 h-4 text-blue-600" />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{file.name}</p>
-                  <div className="mt-1 w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                    <div 
-                      className={`h-1.5 transition-all duration-300 ${file.status === 'error' ? 'bg-red-500' : 'bg-blue-600'}`}
-                      style={{ width: `${file.progress}%` }}
-                    ></div>
-                  </div>
-                </div>
-                <div className="shrink-0 flex items-center w-12 justify-end">
-                  {file.status === 'uploading' && <span className="text-xs font-semibold text-gray-600">{file.progress}%</span>}
-                  {file.status === 'success' && <CheckCircle className="w-5 h-5 text-green-500" />}
-                  {file.status === 'error' && <AlertCircle className="w-5 h-5 text-red-500" />}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Controls */}
       <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col lg:flex-row gap-4 justify-between items-center">

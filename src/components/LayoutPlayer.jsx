@@ -82,6 +82,55 @@ const PlaylistZonePlayer = ({ playlist }) => {
   );
 };
 
+export const LayoutZonesRenderer = ({ zones }) => {
+  return (
+    <>
+      {(zones || []).map((zone) => {
+        const style = {
+          position: "absolute",
+          left: `${zone.left}%`,
+          top: `${zone.top}%`,
+          width: `${zone.width}%`,
+          height: `${zone.height}%`,
+          zIndex: zone.layer || 1,
+          backgroundColor: zone.bg_color || "transparent",
+        };
+
+        return (
+          <div key={zone.id} style={style} className="overflow-hidden">
+            {zone.content_type === "media" && zone.media && (
+              zone.media.file_type === "video" ? (
+                <video
+                  src={zone.media.url}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <img
+                  src={zone.media.url}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+              )
+            )}
+
+            {zone.content_type === "playlist" && zone.playlist && (
+              <PlaylistZonePlayer playlist={zone.playlist} />
+            )}
+
+            {zone.content_type === "color" && (
+              <div className="w-full h-full" style={{ backgroundColor: zone.bg_color }} />
+            )}
+          </div>
+        );
+      })}
+    </>
+  );
+};
+
 const LayoutPlayer = () => {
   const { id } = useParams();
   const [layout, setLayout] = useState(null);
@@ -92,7 +141,10 @@ const LayoutPlayer = () => {
     const fetchLayout = async () => {
       if (id === "preview_local") {
         try {
-          const tempZones = JSON.parse(sessionStorage.getItem("smp_preview_temp") || "[]");
+          const raw =
+            sessionStorage.getItem("smp_preview_temp") ||
+            localStorage.getItem("smp_preview_temp");
+          const tempZones = JSON.parse(raw || "[]");
           setLayout({
             id: "preview_local",
             name: "Unsaved Local Preview",
@@ -156,49 +208,8 @@ const LayoutPlayer = () => {
 
   return (
     <div className="w-screen h-screen bg-black overflow-hidden relative select-none">
-      {zones.map((zone) => {
-        const style = {
-          position: "absolute",
-          left: `${zone.left}%`,
-          top: `${zone.top}%`,
-          width: `${zone.width}%`,
-          height: `${zone.height}%`,
-          zIndex: zone.layer || 1,
-          backgroundColor: zone.bg_color || "transparent",
-        };
+      <LayoutZonesRenderer zones={zones} />
 
-        return (
-          <div key={zone.id} style={style} className="overflow-hidden">
-            {zone.content_type === "media" && zone.media && (
-              zone.media.file_type === "video" ? (
-                <video
-                  src={zone.media.url}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <img
-                  src={zone.media.url}
-                  alt=""
-                  className="w-full h-full object-cover"
-                />
-              )
-            )}
-            
-            {zone.content_type === "playlist" && zone.playlist && (
-              <PlaylistZonePlayer playlist={zone.playlist} />
-            )}
-            
-            {zone.content_type === "color" && (
-              <div className="w-full h-full" style={{ backgroundColor: zone.bg_color }} />
-            )}
-          </div>
-        );
-      })}
-      
       {zones.length === 0 && (
         <div className="w-full h-full flex items-center justify-center text-slate-500">
           Empty Layout Configuration

@@ -36,7 +36,7 @@ const Layout = () => {
   const navItems = [
     { path: "/", icon: LayoutDashboard, label: "Dashboard" },
     { path: "/players", icon: MonitorPlay, label: "Players" },
-    { path: "/content", icon: FileVideo, label: "Content" },
+    // { path: "/content", icon: FileVideo, label: "Content" },
     { path: "/schedules", icon: Calendar, label: "Schedules" },
     {
       path: "/media-library",
