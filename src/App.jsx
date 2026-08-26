@@ -20,6 +20,7 @@ import Layouts from "./pages/Layouts";
 import LayoutPlayer from "./components/LayoutPlayer";
 import PlaylistPlayer from "./components/PlaylistPlayer";
 import ScreenOff from "./components/ScreenOff";
+import { UploadProvider } from "./context/UploadContext";
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("smp_token");
@@ -48,7 +49,8 @@ const App = () => {
     }
   }, []);
   return (
-    <Routes>
+    <UploadProvider>
+      <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/public/layouts/:id" element={<LayoutPlayer />} />
       <Route path="/public/playlists/:id" element={<PlaylistPlayer />} />
@@ -73,7 +75,8 @@ const App = () => {
 
       {/* Redirect unknown routes to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+      </Routes>
+    </UploadProvider>
   );
 };
 
