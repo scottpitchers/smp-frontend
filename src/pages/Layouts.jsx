@@ -21,6 +21,7 @@ import {
   Grid,
   Loader2,
 } from "lucide-react";
+import { LayoutZonesRenderer } from "../components/LayoutPlayer";
 
 const API_URL =
   import.meta.env.VITE_API_URL || "https://smp-api-i5f5.onrender.com";
@@ -525,12 +526,13 @@ const Layouts = () => {
 
   const updateSelectedZone = (field, value) => {
     setLayoutZones(
-      layoutZones.map((z) => {
-        if (z.id === selectedZoneId) {
-          return { ...z, [field]: value };
-        }
-        return z;
-      }),
+      (prev) =>
+        prev.map((z) => {
+          if (z.id === selectedZoneId) {
+            return { ...z, [field]: value };
+          }
+          return z;
+        }),
     );
   };
 
@@ -722,9 +724,36 @@ const Layouts = () => {
     }
   };
 
-  const getMediaUrl = (mediaId) => {
-    const m = mediaLibrary.find((x) => x.id === mediaId);
-    return m ? m.url : "";
+  const getPreviewZones = () => {
+    const source =
+      previewingId === "local"
+        ? layoutZones
+        : layouts.find((l) => l.id === previewingId)?.zones || [];
+    return source.map((z) => {
+      const zoneCopy = { ...z };
+      if (zoneCopy.content_type === "playlist" && zoneCopy.content_id) {
+        const p = playlists.find((x) => x.id === zoneCopy.content_id);
+        if (p) {
+          zoneCopy.playlist = {
+            id: p.id,
+            name: p.name,
+            items: p.items,
+          };
+        }
+      } else if (zoneCopy.content_type === "media" && zoneCopy.content_id) {
+        const m = mediaLibrary.find((x) => x.id === zoneCopy.content_id);
+        if (m) {
+          zoneCopy.media = {
+            id: m.id,
+            filename: m.filename,
+            original_filename: m.original_filename,
+            file_type: m.file_type,
+            url: m.url,
+          };
+        }
+      }
+      return zoneCopy;
+    });
   };
 
   const activeZone = layoutZones.find((z) => z.id === selectedZoneId);
@@ -1028,7 +1057,30 @@ const Layouts = () => {
                   const isActive = zone.id === selectedZoneId;
                   const isPlaylist = zone.content_type === "playlist";
                   const isMedia = zone.content_type === "media";
-                  const hasContent = zone.content_id !== null;
+                  const assignedMedia =
+                    isMedia && zone.content_id
+                      ? mediaLibrary.find((x) => x.id === zone.content_id)
+                      : null;
+                  const assignedPlaylist =
+                    isPlaylist && zone.content_id
+                      ? playlists.find((x) => x.id === zone.content_id)
+                      : null;
+
+                  let statusLabel = "Empty Zone";
+                  if (assignedPlaylist) {
+                    statusLabel = `▶ ${assignedPlaylist.name}`;
+                  } else if (isPlaylist) {
+                    statusLabel = "Choose a playlist";
+                  } else if (assignedMedia) {
+                    statusLabel =
+                      assignedMedia.original_filename ||
+                      assignedMedia.filename ||
+                      "Media Item";
+                  } else if (isMedia) {
+                    statusLabel = "No media selected";
+                  } else if (zone.content_type === "color") {
+                    statusLabel = "Color Background";
+                  }
 
                   return (
                     <div
@@ -1051,15 +1103,27 @@ const Layouts = () => {
                           : "border-slate-700/60 hover:border-slate-500"
                       }`}
                     >
+                      {/* Assigned content preview */}
+                      {assignedMedia &&
+                        assignedMedia.file_type !== "video" &&
+                        assignedMedia.url && (
+                          <img
+                            src={assignedMedia.url}
+                            alt=""
+                            draggable={false}
+                            className="absolute inset-0 w-full h-full object-cover pointer-events-none opacity-80 group-hover:opacity-100 transition-opacity"
+                          />
+                        )}
+                      {assignedMedia && assignedMedia.file_type === "video" && (
+                        <Film className="relative z-10 w-5 h-5 text-white/90 drop-shadow mb-1" />
+                      )}
+
                       {/* Name / info */}
-                      <span className="text-white text-xs font-bold drop-shadow truncate max-w-full">
+                      <span className="relative z-10 text-white text-xs font-bold drop-shadow truncate max-w-full">
                         {zone.name}
                       </span>
-                      <span className="text-[10px] text-slate-300 drop-shadow mt-0.5 max-w-full truncate">
-                        {isPlaylist && "Playlist Assigned"}
-                        {isMedia && "Single Media"}
-                        {zone.content_type === "color" && "Color Background"}
-                        {zone.content_type === "empty" && "Empty Zone"}
+                      <span className="relative z-10 text-[10px] text-slate-200 drop-shadow mt-0.5 max-w-full truncate">
+                        {statusLabel}
                       </span>
 
                       {/* Top Left resize handle */}
@@ -1265,7 +1329,7 @@ const Layouts = () => {
                           updateSelectedZone("content_type", "playlist");
                           updateSelectedZone("content_id", null);
                         }}
-                        className={`py-1 text-center rounded text-xs font-bold transition-all ${
+                        className={`py-1 cursor-pointer text-center rounded text-xs font-bold transition-all ${
                           activeZone.content_type === "playlist"
                             ? "bg-white text-gray-900 shadow-sm"
                             : "text-gray-500 hover:text-gray-900"
@@ -1291,7 +1355,7 @@ const Layouts = () => {
                           updateSelectedZone("content_type", "color");
                           updateSelectedZone("content_id", null);
                         }}
-                        className={`py-1 text-center rounded text-xs font-bold transition-all ${
+                        className={`py-1 text-center cursor-pointer rounded text-xs font-bold transition-all ${
                           activeZone.content_type === "color"
                             ? "bg-white text-gray-900 shadow-sm"
                             : "text-gray-500 hover:text-gray-900"
@@ -1304,7 +1368,7 @@ const Layouts = () => {
                           updateSelectedZone("content_type", "empty");
                           updateSelectedZone("content_id", null);
                         }}
-                        className={`py-1 text-center rounded text-xs font-bold transition-all ${
+                        className={`py-1 text-center cursor-pointer rounded text-xs font-bold transition-all ${
                           activeZone.content_type === "empty"
                             ? "bg-white text-gray-900 shadow-sm"
                             : "text-gray-500 hover:text-gray-900"
@@ -1608,44 +1672,9 @@ const Layouts = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => {
-                  const enriched = layoutZones.map((z) => {
-                    const zoneCopy = { ...z };
-                    if (
-                      zoneCopy.content_type === "playlist" &&
-                      zoneCopy.content_id
-                    ) {
-                      const p = playlists.find(
-                        (x) => x.id === zoneCopy.content_id,
-                      );
-                      if (p) {
-                        zoneCopy.playlist = {
-                          id: p.id,
-                          name: p.name,
-                          items: p.items,
-                        };
-                      }
-                    } else if (
-                      zoneCopy.content_type === "media" &&
-                      zoneCopy.content_id
-                    ) {
-                      const m = mediaLibrary.find(
-                        (x) => x.id === zoneCopy.content_id,
-                      );
-                      if (m) {
-                        zoneCopy.media = {
-                          id: m.id,
-                          filename: m.filename,
-                          original_filename: m.original_filename,
-                          file_type: m.file_type,
-                          url: m.url,
-                        };
-                      }
-                    }
-                    return zoneCopy;
-                  });
-                  sessionStorage.setItem(
+                  localStorage.setItem(
                     "smp_preview_temp",
-                    JSON.stringify(enriched),
+                    JSON.stringify(getPreviewZones()),
                   );
                   window.open(`/public/layouts/preview_local`, "_blank");
                 }}
@@ -1665,58 +1694,8 @@ const Layouts = () => {
 
           {/* View Container */}
           <div className="flex-1 bg-black flex items-center justify-center p-4">
-            <div className="w-full max-w-5xl aspect-video border border-slate-700 rounded-xl overflow-hidden relative shadow-2xl">
-              {/* iframe rendering the live layout renderer page */}
-              <iframe
-                src={
-                  previewingId === "local"
-                    ? (() => {
-                        const enriched = layoutZones.map((z) => {
-                          const zoneCopy = { ...z };
-                          if (
-                            zoneCopy.content_type === "playlist" &&
-                            zoneCopy.content_id
-                          ) {
-                            const p = playlists.find(
-                              (x) => x.id === zoneCopy.content_id,
-                            );
-                            if (p) {
-                              zoneCopy.playlist = {
-                                id: p.id,
-                                name: p.name,
-                                items: p.items,
-                              };
-                            }
-                          } else if (
-                            zoneCopy.content_type === "media" &&
-                            zoneCopy.content_id
-                          ) {
-                            const m = mediaLibrary.find(
-                              (x) => x.id === zoneCopy.content_id,
-                            );
-                            if (m) {
-                              zoneCopy.media = {
-                                id: m.id,
-                                filename: m.filename,
-                                original_filename: m.original_filename,
-                                file_type: m.file_type,
-                                url: m.url,
-                              };
-                            }
-                          }
-                          return zoneCopy;
-                        });
-                        sessionStorage.setItem(
-                          "smp_preview_temp",
-                          JSON.stringify(enriched),
-                        );
-                        return "/public/layouts/preview_local";
-                      })()
-                    : `/public/layouts/${previewingId}`
-                }
-                title="Signage Feed Preview"
-                className="w-full h-full border-none pointer-events-none select-none bg-black"
-              />
+            <div className="w-full max-w-5xl aspect-video border border-slate-700 rounded-xl overflow-hidden relative shadow-2xl bg-black">
+              <LayoutZonesRenderer zones={getPreviewZones()} />
             </div>
           </div>
         </div>
